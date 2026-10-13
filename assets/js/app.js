@@ -454,6 +454,11 @@ async function descargarPdf() {
 
     const parsed = parseStructuredMarkdown(reporteCompleto);
     const contenidoOriginal = btnDescargarPdf.innerHTML;
+    const scrollOriginal = window.scrollY;
+
+    // html2pdf calcula posiciones con el desplazamiento actual de la página;
+    // si no está arriba, la primera hoja del PDF sale en blanco.
+    window.scrollTo(0, 0);
 
     btnDescargarPdf.disabled = true;
     btnDescargarPdf.innerHTML = `
@@ -467,7 +472,7 @@ async function descargarPdf() {
                 margin: [15, 15, 18, 15],
                 filename: `${nombreArchivoPdf(parsed.title)}.pdf`,
                 image: { type: "jpeg", quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
+                html2canvas: { scale: 2, useCORS: true, scrollX: 0, scrollY: 0 },
                 jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
                 pagebreak: {
                     mode: ["css", "legacy"],
@@ -484,6 +489,7 @@ async function descargarPdf() {
     } finally {
         btnDescargarPdf.disabled = false;
         btnDescargarPdf.innerHTML = contenidoOriginal;
+        window.scrollTo(0, scrollOriginal);
     }
 }
 
