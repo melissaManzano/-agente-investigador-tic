@@ -329,9 +329,20 @@
                             </p>
                         </div>
 
-                        <div class="result-badge">
-                            <i class="bi bi-check-circle-fill me-1"></i>
-                            Listo
+                        <div class="result-actions">
+                            <div class="result-badge">
+                                <i class="bi bi-check-circle-fill me-1"></i>
+                                Listo
+                            </div>
+
+                            <button
+                                id="btnDescargarPdf"
+                                type="button"
+                                class="btn btn-primary pdf-btn"
+                            >
+                                <i class="bi bi-file-earmark-pdf me-1"></i>
+                                Descargar PDF
+                            </button>
                         </div>
                     </div>
 
@@ -380,6 +391,7 @@
         </div>
     </footer>
 
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
     <script src="/assets/js/app.js"></script>
 
 </body>

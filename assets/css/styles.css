@@ -501,6 +501,19 @@ body {
     font-weight: 700;
 }
 
+.result-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 10px;
+}
+
+.pdf-btn {
+    border-radius: 999px;
+    padding: 10px 18px;
+    font-weight: 700;
+}
+
 .report-layout {
     display: grid;
     gap: 18px;

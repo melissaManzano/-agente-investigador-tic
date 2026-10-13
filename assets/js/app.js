@@ -13,12 +13,14 @@ const contadorFuentesFinal = document.getElementById("contadorFuentesFinal");
 const resultado = document.getElementById("resultado");
 const reporte = document.getElementById("reporte");
 const error = document.getElementById("error");
+const btnDescargarPdf = document.getElementById("btnDescargarPdf");
 
 let fuentesConsultadas = [];
 let reporteCompleto = "";
 
 
 btnInvestigar.addEventListener("click", investigar);
+btnDescargarPdf.addEventListener("click", descargarPdf);
 
 
 async function investigar() {
@@ -333,6 +335,12 @@ function finalizarFlujo() {
 function renderizarReporteFinal(markdown) {
     const parsed = parseStructuredMarkdown(markdown);
 
+    // Las consultas del Tec y los rechazos no usan el formato de 7 secciones.
+    if (!parsed.sections["3. Hallazgos principales"]) {
+        reporte.innerHTML = renderReporteGenerico(parsed);
+        return;
+    }
+
     let html = `
         <section class="report-hero">
             <div class="eyebrow text-white-50 mb-2">
@@ -392,6 +400,344 @@ function renderizarReporteFinal(markdown) {
     `;
 
     reporte.innerHTML = html;
+}
+
+
+function renderReporteGenerico(parsed) {
+    const nombres = Object.keys(parsed.sections);
+    const resumen = parsed.intro || parsed.sections[nombres[0]] || "";
+
+    let html = `
+        <section class="report-hero">
+            <div class="report-title">
+                ${escaparHTML(parsed.title)}
+            </div>
+            <div class="report-lead">
+                ${escaparHTML(extraerResumen(resumen))}
+            </div>
+        </section>
+    `;
+
+    if (parsed.intro) {
+        html += `
+            <section class="report-grid-1">
+                ${renderCard("bi-info-circle", "Respuesta", markdownToBasicHtml(parsed.intro))}
+            </section>
+        `;
+    }
+
+    nombres.forEach(nombre => {
+        html += `
+            <section class="report-grid-1">
+                ${renderCard("bi-info-circle", nombre, markdownToBasicHtml(parsed.sections[nombre]))}
+            </section>
+        `;
+    });
+
+    return html;
+}
+
+
+/* =========================================================
+   DESCARGA EN PDF
+   ========================================================= */
+
+async function descargarPdf() {
+    if (!reporteCompleto.trim()) {
+        return;
+    }
+
+    if (typeof html2pdf === "undefined") {
+        mostrarError("No se pudo cargar el generador de PDF. Revisa tu conexión e inténtalo de nuevo.");
+        return;
+    }
+
+    const parsed = parseStructuredMarkdown(reporteCompleto);
+    const contenidoOriginal = btnDescargarPdf.innerHTML;
+
+    btnDescargarPdf.disabled = true;
+    btnDescargarPdf.innerHTML = `
+        <span class="spinner-border spinner-border-sm me-1"></span>
+        Generando PDF...
+    `;
+
+    try {
+        await html2pdf()
+            .set({
+                margin: [15, 15, 18, 15],
+                filename: `${nombreArchivoPdf(parsed.title)}.pdf`,
+                image: { type: "jpeg", quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+                pagebreak: {
+                    mode: ["css", "legacy"],
+                    avoid: ["h2", "h3", "li", "tr", "p", ".pdf-fuente"]
+                }
+            })
+            .from(construirDocumentoPdf(parsed))
+            .toPdf()
+            .get("pdf")
+            .then(agregarNumerosDePagina)
+            .save();
+    } catch (err) {
+        mostrarError(`No se pudo generar el PDF. ${err.message || ""}`);
+    } finally {
+        btnDescargarPdf.disabled = false;
+        btnDescargarPdf.innerHTML = contenidoOriginal;
+    }
+}
+
+
+function construirDocumentoPdf(parsed) {
+    const fecha = new Date().toLocaleDateString("es-MX", {
+        day: "numeric",
+        month: "long",
+        year: "numeric"
+    });
+
+    let cuerpo = "";
+
+    if (parsed.intro) {
+        cuerpo += markdownAHtmlPdf(parsed.intro);
+    }
+
+    Object.entries(parsed.sections).forEach(([nombre, contenido]) => {
+        cuerpo += `<h2>${formatInlineMarkdown(nombre)}</h2>`;
+        cuerpo += markdownAHtmlPdf(contenido);
+    });
+
+    if (fuentesConsultadas.length) {
+        cuerpo += "<h2>Fuentes consultadas</h2><ol>";
+
+        fuentesConsultadas.forEach(fuente => {
+            const titulo = fuente.titulo && fuente.titulo !== fuente.url
+                ? fuente.titulo
+                : obtenerDominio(fuente.url);
+
+            cuerpo += `
+                <li class="pdf-fuente">
+                    ${escaparHTML(titulo)}<br>
+                    <span class="pdf-url">${escaparHTML(fuente.url)}</span>
+                </li>
+            `;
+        });
+
+        cuerpo += "</ol>";
+    }
+
+    const documento = document.createElement("div");
+
+    documento.innerHTML = `
+        <style>
+            .pdf-doc {
+                width: 180mm;
+                font-family: "Inter", Arial, sans-serif;
+                font-size: 10.5pt;
+                line-height: 1.5;
+                color: #142033;
+                background: #ffffff;
+            }
+            .pdf-doc .pdf-header {
+                border-bottom: 3px solid #4f7cff;
+                padding-bottom: 10px;
+                margin-bottom: 16px;
+            }
+            .pdf-doc .pdf-kicker {
+                font-size: 8pt;
+                font-weight: 700;
+                letter-spacing: 0.08em;
+                color: #4f7cff;
+            }
+            .pdf-doc h1 {
+                font-size: 19pt;
+                font-weight: 800;
+                margin: 4px 0;
+            }
+            .pdf-doc .pdf-meta {
+                font-size: 8.5pt;
+                color: #5f6f87;
+            }
+            .pdf-doc h2 {
+                font-size: 13pt;
+                font-weight: 700;
+                color: #1e3a8a;
+                margin: 18px 0 8px;
+            }
+            .pdf-doc h3 {
+                font-size: 11pt;
+                font-weight: 700;
+                margin: 12px 0 6px;
+            }
+            .pdf-doc p {
+                margin: 0 0 7px;
+            }
+            .pdf-doc ul,
+            .pdf-doc ol {
+                margin: 0 0 8px;
+                padding-left: 20px;
+            }
+            .pdf-doc li {
+                margin-bottom: 4px;
+            }
+            .pdf-doc table {
+                width: 100%;
+                border-collapse: collapse;
+                font-size: 8.5pt;
+                margin: 6px 0 10px;
+            }
+            .pdf-doc th,
+            .pdf-doc td {
+                border: 1px solid #cbd5e1;
+                padding: 5px 6px;
+                text-align: left;
+                vertical-align: top;
+            }
+            .pdf-doc th {
+                background: #eef2ff;
+                font-weight: 700;
+            }
+            .pdf-doc .pdf-url {
+                font-size: 8pt;
+                color: #4f7cff;
+                word-break: break-all;
+            }
+        </style>
+
+        <div class="pdf-doc">
+            <div class="pdf-header">
+                <div class="pdf-kicker">AGENTE INVESTIGADOR · REPORTE</div>
+                <h1>${formatInlineMarkdown(parsed.title)}</h1>
+                <div class="pdf-meta">
+                    Pregunta: ${escaparHTML(pregunta.value.trim())}<br>
+                    Generado el ${escaparHTML(fecha)}
+                </div>
+            </div>
+
+            ${cuerpo}
+        </div>
+    `;
+
+    return documento;
+}
+
+
+function markdownAHtmlPdf(texto) {
+    const lineas = texto.split("\n");
+
+    let html = "";
+    let lista = null;
+    let tabla = [];
+
+    const cerrarLista = () => {
+        if (lista) {
+            html += `</${lista}>`;
+            lista = null;
+        }
+    };
+
+    const cerrarTabla = () => {
+        if (!tabla.length) {
+            return;
+        }
+
+        const parsedTabla = parseMarkdownTable(tabla.join("\n"));
+
+        if (parsedTabla) {
+            html += "<table><thead><tr>";
+            parsedTabla.headers.forEach(celda => {
+                html += `<th>${formatInlineMarkdown(celda)}</th>`;
+            });
+            html += "</tr></thead><tbody>";
+
+            parsedTabla.rows.forEach(fila => {
+                html += "<tr>";
+                fila.forEach(celda => {
+                    html += `<td>${formatInlineMarkdown(celda)}</td>`;
+                });
+                html += "</tr>";
+            });
+
+            html += "</tbody></table>";
+        }
+
+        tabla = [];
+    };
+
+    for (const raw of lineas) {
+        const linea = raw.trim();
+
+        if (linea.startsWith("|")) {
+            cerrarLista();
+            tabla.push(linea);
+            continue;
+        }
+
+        cerrarTabla();
+
+        if (!linea) {
+            cerrarLista();
+            continue;
+        }
+
+        const subtitulo = linea.match(/^#{3,6}\s+(.*)$/);
+        const vineta = linea.match(/^[-*•]\s+(.*)$/);
+        const numerada = linea.match(/^\d+[.)]\s+(.*)$/);
+
+        if (subtitulo) {
+            cerrarLista();
+            html += `<h3>${formatInlineMarkdown(subtitulo[1])}</h3>`;
+        } else if (vineta || numerada) {
+            const tipo = vineta ? "ul" : "ol";
+
+            if (lista !== tipo) {
+                cerrarLista();
+                html += `<${tipo}>`;
+                lista = tipo;
+            }
+
+            html += `<li>${formatInlineMarkdown((vineta || numerada)[1])}</li>`;
+        } else {
+            cerrarLista();
+            html += `<p>${formatInlineMarkdown(linea)}</p>`;
+        }
+    }
+
+    cerrarTabla();
+    cerrarLista();
+
+    return html;
+}
+
+
+function agregarNumerosDePagina(pdf) {
+    const total = pdf.internal.getNumberOfPages();
+    const ancho = pdf.internal.pageSize.getWidth();
+    const alto = pdf.internal.pageSize.getHeight();
+
+    for (let pagina = 1; pagina <= total; pagina++) {
+        pdf.setPage(pagina);
+        pdf.setFontSize(8);
+        pdf.setTextColor(120);
+        pdf.text(
+            `Página ${pagina} de ${total}`,
+            ancho / 2,
+            alto - 8,
+            { align: "center" }
+        );
+    }
+}
+
+
+function nombreArchivoPdf(titulo) {
+    const base = (titulo || "reporte")
+        .normalize("NFD")
+        .replace(/[̀-ͯ]/g, "")
+        .replace(/[^a-zA-Z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "")
+        .toLowerCase()
+        .slice(0, 60);
+
+    return `${base || "reporte"}-${new Date().toISOString().slice(0, 10)}`;
 }
 
 
@@ -713,6 +1059,7 @@ function parseStructuredMarkdown(markdown) {
     const lines = text.split("\n");
 
     let title = "Reporte de investigación";
+    let intro = "";
     const sections = {};
 
     let currentSection = null;
@@ -723,6 +1070,8 @@ function parseStructuredMarkdown(markdown) {
         if (!line.trim()) {
             if (currentSection) {
                 sections[currentSection] += "\n";
+            } else if (intro) {
+                intro += "\n";
             }
             continue;
         }
@@ -742,10 +1091,12 @@ function parseStructuredMarkdown(markdown) {
 
         if (currentSection) {
             sections[currentSection] += (sections[currentSection] ? "\n" : "") + line;
+        } else {
+            intro += (intro ? "\n" : "") + line;
         }
     }
 
-    return { title, sections };
+    return { title, intro: intro.trim(), sections };
 }
 
 
