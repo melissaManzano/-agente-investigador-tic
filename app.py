@@ -1,9 +1,29 @@
 import json
+import os
 
 from flask import Flask, Response, render_template, request, stream_with_context
 from openai import OpenAI
 
-from config import OPENAI_API_KEY, OPENAI_MODEL
+# En Vercel las credenciales llegan como variables de entorno;
+# en local se usa config.py (ignorado por git) como respaldo.
+try:
+    import config
+except ImportError:
+    config = None
+
+OPENAI_API_KEY = os.environ.get("OPENAI_API_KEY") or getattr(config, "OPENAI_API_KEY", None)
+OPENAI_MODEL = os.environ.get("OPENAI_MODEL") or getattr(config, "OPENAI_MODEL", "gpt-5")
+
+# Orígenes externos autorizados a llamar a la API, separados por comas
+# (ej. "https://usuario.github.io"). La propia página siempre está permitida.
+ALLOWED_ORIGINS = {
+    origen.strip().rstrip("/")
+    for origen in (
+        os.environ.get("ALLOWED_ORIGIN")
+        or getattr(config, "ALLOWED_ORIGIN", "")
+    ).split(",")
+    if origen.strip()
+}
 
 
 app = Flask(
@@ -13,6 +33,51 @@ app = Flask(
 )
 
 client = OpenAI(api_key=OPENAI_API_KEY)
+
+
+def origen_permitido(origen):
+    if not origen:
+        return True
+
+    mismo_sitio = origen.split("://", 1)[-1] == request.host
+
+    return mismo_sitio or origen.rstrip("/") in ALLOWED_ORIGINS
+
+
+@app.before_request
+def validar_origen():
+    if not request.path.startswith("/api/"):
+        return None
+
+    if not origen_permitido(request.headers.get("Origin")):
+        return Response(
+            sse(
+                "error",
+                {
+                    "mensaje": "Origen no autorizado para usar esta API."
+                }
+            ),
+            mimetype="text/event-stream",
+            status=403
+        )
+
+    if request.method == "OPTIONS":
+        return Response(status=204)
+
+    return None
+
+
+@app.after_request
+def agregar_cors(respuesta):
+    origen = request.headers.get("Origin")
+
+    if origen and origen.rstrip("/") in ALLOWED_ORIGINS:
+        respuesta.headers["Access-Control-Allow-Origin"] = origen
+        respuesta.headers["Access-Control-Allow-Methods"] = "POST, OPTIONS"
+        respuesta.headers["Access-Control-Allow-Headers"] = "Content-Type"
+        respuesta.headers["Vary"] = "Origin"
+
+    return respuesta
 
 
 @app.route("/")
@@ -73,7 +138,7 @@ def emitir_fuentes_desde_accion(accion, urls_emitidas):
     return nuevas_fuentes
 
 
-@app.route("/api/investigar", methods=["POST"])
+@app.route("/api/investigar", methods=["POST", "OPTIONS"])
 def investigar():
     datos = request.get_json(silent=True) or {}
     pregunta = datos.get("pregunta", "").strip()
@@ -93,6 +158,31 @@ def investigar():
     instrucciones = """
 Eres un agente investigador especializado en tecnologías de información
 y comunicaciones.
+
+ALCANCE TEMÁTICO (REGLA PRIORITARIA):
+Solo puedes responder preguntas relacionadas con el área de las
+tecnologías de la información y comunicaciones (TIC). Esto incluye, entre
+otros: desarrollo de software, programación, redes y telecomunicaciones,
+ciberseguridad, bases de datos, inteligencia artificial, computación en la
+nube, infraestructura y hardware, sistemas operativos, Internet,
+transformación digital y gestión de proyectos o servicios de TI.
+
+Antes de hacer cualquier otra cosa, evalúa si la pregunta pertenece a
+esta área. Si la pregunta NO tiene relación con las TIC:
+- No realices búsquedas web.
+- No generes el reporte ni sigas el formato de salida.
+- No respondas parcialmente ni ofrezcas información sobre el tema.
+- Responde únicamente con el siguiente mensaje, sin agregar nada más:
+
+# Petición fuera del área de TIC
+
+Lo siento, no puedo responder esta petición. Soy un agente investigador
+especializado únicamente en temas de tecnologías de la información y
+comunicaciones (TIC). Por favor, realiza una pregunta relacionada con
+esta área.
+
+Si la pregunta sí pertenece al área de TIC, continúa con el proceso
+descrito a continuación.
 
 Debes investigar la pregunta del usuario utilizando búsqueda web
 y varias fuentes confiables. El tono debe ser claro, profesional y
