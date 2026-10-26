@@ -522,7 +522,7 @@ function construirDocumentoPdf(parsed) {
     }
 
     Object.entries(parsed.sections).forEach(([nombre, contenido]) => {
-        cuerpo += `<h2>${formatInlineMarkdown(nombre)}</h2>`;
+        cuerpo += `<h2>${formatoPdf(nombre)}</h2>`;
         cuerpo += markdownAHtmlPdf(contenido);
     });
 
@@ -537,7 +537,7 @@ function construirDocumentoPdf(parsed) {
             cuerpo += `
                 <li class="pdf-fuente">
                     ${escaparHTML(titulo)}<br>
-                    <span class="pdf-url">${escaparHTML(fuente.url)}</span>
+                    <span class="pdf-url">${escaparHTML(partirPalabrasLargas(fuente.url))}</span>
                 </li>
             `;
         });
@@ -601,8 +601,10 @@ function construirDocumentoPdf(parsed) {
             }
             .pdf-doc table {
                 width: 100%;
+                table-layout: fixed;
                 border-collapse: collapse;
-                font-size: 8.5pt;
+                font-size: 8pt;
+                line-height: 1.4;
                 margin: 6px 0 10px;
             }
             .pdf-doc th,
@@ -612,6 +614,9 @@ function construirDocumentoPdf(parsed) {
                 text-align: left;
                 vertical-align: top;
             }
+            .pdf-doc th:first-child {
+                width: 16%;
+            }
             .pdf-doc th {
                 background: #eaf0fa;
                 font-weight: 700;
@@ -619,14 +624,13 @@ function construirDocumentoPdf(parsed) {
             .pdf-doc .pdf-url {
                 font-size: 8pt;
                 color: #2f6fde;
-                word-break: break-all;
             }
         </style>
 
         <div class="pdf-doc">
             <div class="pdf-header">
                 <div class="pdf-kicker">AGENTE INVESTIGADOR · REPORTE</div>
-                <h1>${formatInlineMarkdown(parsed.title)}</h1>
+                <h1>${formatoPdf(parsed.title)}</h1>
                 <div class="pdf-meta">
                     Pregunta: ${escaparHTML(pregunta.value.trim())}<br>
                     Generado el ${escaparHTML(fecha)}
@@ -665,14 +669,14 @@ function markdownAHtmlPdf(texto) {
         if (parsedTabla) {
             html += "<table><thead><tr>";
             parsedTabla.headers.forEach(celda => {
-                html += `<th>${formatInlineMarkdown(celda)}</th>`;
+                html += `<th>${formatoPdf(celda)}</th>`;
             });
             html += "</tr></thead><tbody>";
 
             parsedTabla.rows.forEach(fila => {
                 html += "<tr>";
                 fila.forEach(celda => {
-                    html += `<td>${formatInlineMarkdown(celda)}</td>`;
+                    html += `<td>${formatoPdf(celda)}</td>`;
                 });
                 html += "</tr>";
             });
@@ -705,7 +709,7 @@ function markdownAHtmlPdf(texto) {
 
         if (subtitulo) {
             cerrarLista();
-            html += `<h3>${formatInlineMarkdown(subtitulo[1])}</h3>`;
+            html += `<h3>${formatoPdf(subtitulo[1])}</h3>`;
         } else if (vineta || numerada) {
             const tipo = vineta ? "ul" : "ol";
 
@@ -715,10 +719,10 @@ function markdownAHtmlPdf(texto) {
                 lista = tipo;
             }
 
-            html += `<li>${formatInlineMarkdown((vineta || numerada)[1])}</li>`;
+            html += `<li>${formatoPdf((vineta || numerada)[1])}</li>`;
         } else {
             cerrarLista();
-            html += `<p>${formatInlineMarkdown(linea)}</p>`;
+            html += `<p>${formatoPdf(linea)}</p>`;
         }
     }
 
@@ -726,6 +730,22 @@ function markdownAHtmlPdf(texto) {
     cerrarLista();
 
     return html;
+}
+
+
+function formatoPdf(texto) {
+    return formatInlineMarkdown(partirPalabrasLargas(texto));
+}
+
+
+// html2pdf no sabe partir palabras largas (como URLs) sin encimar el texto,
+// así que se insertan espacios de ancho cero donde se permite el salto de línea.
+function partirPalabrasLargas(texto) {
+    return String(texto ?? "").replace(/\S{20,}/g, palabra =>
+        palabra
+            .replace(/([\/.\-_?=&#])/g, "$1​")
+            .replace(/[^\s​]{18}(?=[^\s​])/g, "$&​")
+    );
 }
 
 
