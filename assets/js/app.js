@@ -22,6 +22,20 @@ let reporteCompleto = "";
 btnInvestigar.addEventListener("click", investigar);
 btnDescargarPdf.addEventListener("click", descargarPdf);
 
+pregunta.addEventListener("keydown", evento => {
+    if (evento.key === "Enter" && (evento.ctrlKey || evento.metaKey) && !btnInvestigar.disabled) {
+        evento.preventDefault();
+        investigar();
+    }
+});
+
+document.querySelectorAll("[data-ejemplo]").forEach(boton => {
+    boton.addEventListener("click", () => {
+        pregunta.value = boton.dataset.ejemplo;
+        pregunta.focus();
+    });
+});
+
 
 async function investigar() {
     const textoPregunta = pregunta.value.trim();
@@ -544,7 +558,7 @@ function construirDocumentoPdf(parsed) {
                 background: #ffffff;
             }
             .pdf-doc .pdf-header {
-                border-bottom: 3px solid #4f7cff;
+                border-bottom: 3px solid #1b396a;
                 padding-bottom: 10px;
                 margin-bottom: 16px;
             }
@@ -552,7 +566,7 @@ function construirDocumentoPdf(parsed) {
                 font-size: 8pt;
                 font-weight: 700;
                 letter-spacing: 0.08em;
-                color: #4f7cff;
+                color: #2f6fde;
             }
             .pdf-doc h1 {
                 font-size: 19pt;
@@ -566,7 +580,7 @@ function construirDocumentoPdf(parsed) {
             .pdf-doc h2 {
                 font-size: 13pt;
                 font-weight: 700;
-                color: #1e3a8a;
+                color: #1b396a;
                 margin: 18px 0 8px;
             }
             .pdf-doc h3 {
@@ -599,12 +613,12 @@ function construirDocumentoPdf(parsed) {
                 vertical-align: top;
             }
             .pdf-doc th {
-                background: #eef2ff;
+                background: #eaf0fa;
                 font-weight: 700;
             }
             .pdf-doc .pdf-url {
                 font-size: 8pt;
-                color: #4f7cff;
+                color: #2f6fde;
                 word-break: break-all;
             }
         </style>

@@ -9,7 +9,23 @@
         content="width=device-width, initial-scale=1.0"
     >
 
-    <title>Agente Investigador</title>
+    <meta
+        name="description"
+        content="Agente investigador con IA para temas de TIC y consultas sobre el Instituto Tecnológico de Pachuca."
+    >
+
+    <meta
+        name="theme-color"
+        content="#1b396a"
+    >
+
+    <title>Agente Investigador · TecNM Pachuca</title>
+
+    <link
+        rel="icon"
+        type="image/svg+xml"
+        href="/assets/img/favicon.svg"
+    >
 
     <link
         rel="preconnect"
@@ -45,349 +61,313 @@
 
 <body>
 
-    <div class="page-bg"></div>
+    <header class="topbar">
+        <div class="app-shell topbar-inner">
+            <a class="brand" href="/">
+                <img
+                    class="brand-logo"
+                    src="/assets/img/favicon.svg"
+                    alt=""
+                    width="36"
+                    height="36"
+                >
 
-    <nav class="navbar navbar-expand-lg navbar-dark app-navbar fixed-top">
-        <div class="container">
-            <a class="navbar-brand fw-bold d-flex align-items-center gap-2" href="#">
-                <span class="brand-mark">
-                    <i class="bi bi-stars"></i>
+                <span class="brand-text">
+                    <strong>Agente Investigador</strong>
+                    <small>TecNM · Campus Pachuca</small>
                 </span>
-                Agente Investigador
             </a>
 
-            <div class="d-flex align-items-center gap-2">
-                <span class="badge badge-soft">
-                    <i class="bi bi-globe2 me-1"></i>
-                    Web Search
-                </span>
-            </div>
-        </div>
-    </nav>
-
-    <header class="hero">
-        <div class="container position-relative">
-            <div class="row justify-content-center">
-                <div class="col-xl-10">
-
-                    <div class="hero-card">
-                        <div class="hero-grid">
-
-                            <div>
-                                <span class="eyebrow">
-                                    PRÁCTICA 2.2 · IA APLICADA A LAS TIC
-                                </span>
-
-                                <h1 class="hero-title">
-                                    Investiga, compara y sintetiza
-                                    información con un agente de IA
-                                </h1>
-
-                                <p class="hero-text">
-                                    Escribe una pregunta y observa cómo el agente
-                                    analiza el problema, consulta fuentes en línea,
-                                    organiza la evidencia y genera un reporte
-                                    profesional.
-                                </p>
-
-                                <div class="hero-badges">
-                                    <span class="pill">
-                                        <i class="bi bi-lightbulb me-1"></i>
-                                        Planificación
-                                    </span>
-
-                                    <span class="pill">
-                                        <i class="bi bi-search me-1"></i>
-                                        Búsqueda web
-                                    </span>
-
-                                    <span class="pill">
-                                        <i class="bi bi-table me-1"></i>
-                                        Comparación
-                                    </span>
-
-                                    <span class="pill">
-                                        <i class="bi bi-file-earmark-richtext me-1"></i>
-                                        Reporte
-                                    </span>
-                                </div>
-                            </div>
-
-                            <div class="hero-side">
-                                <div class="mini-panel">
-                                    <div class="mini-title">
-                                        Flujo del agente
-                                    </div>
-
-                                    <div class="mini-steps">
-                                        <div><span>1</span> Analiza la pregunta</div>
-                                        <div><span>2</span> Busca fuentes</div>
-                                        <div><span>3</span> Contrasta evidencia</div>
-                                        <div><span>4</span> Genera reporte</div>
-                                    </div>
-                                </div>
-                            </div>
-
-                        </div>
-                    </div>
-
-                </div>
-            </div>
+            <span class="topbar-tag">
+                <span class="live-dot"></span>
+                Búsqueda web en vivo
+            </span>
         </div>
     </header>
 
-    <main class="container main-content">
+    <main class="app-shell app-main">
 
-        <div class="row justify-content-center">
-            <div class="col-xl-10">
+        <section class="intro">
+            <span class="eyebrow">
+                Práctica 2.2 · Inteligencia Artificial aplicada a las TIC
+            </span>
 
-                <section class="glass-card composer-card mb-4">
-                    <div class="card-topbar"></div>
+            <h1 class="intro-title">
+                Investiga con un agente de IA
+            </h1>
 
-                    <div class="p-4 p-lg-5">
+            <p class="intro-text">
+                Haz una pregunta sobre tecnologías de la información y
+                comunicaciones o sobre el Tecnológico de Pachuca. El agente
+                busca en fuentes confiables, compara la evidencia y te entrega
+                un reporte que puedes descargar en PDF.
+            </p>
+        </section>
 
-                        <div class="section-heading mb-3">
-                            <div class="section-icon">
-                                <i class="bi bi-question-circle"></i>
-                            </div>
+        <section class="panel composer">
+            <label
+                for="pregunta"
+                class="composer-label"
+            >
+                Tu pregunta
+            </label>
 
-                            <div>
-                                <span class="section-kicker">CONSULTA</span>
-                                <h2 class="section-title mb-1">
-                                    Pregunta de investigación
-                                </h2>
-                                <p class="section-subtitle mb-0">
-                                    Puedes preguntar sobre IoT, IA, redes,
-                                    ciberseguridad, nube u otras tecnologías.
-                                </p>
-                            </div>
-                        </div>
+            <textarea
+                id="pregunta"
+                class="form-control question-box"
+                rows="4"
+                placeholder="Ejemplo: ¿Qué tecnologías de conectividad se usan actualmente en IoT y en qué escenarios conviene cada una?"
+            ></textarea>
 
-                        <textarea
-                            id="pregunta"
-                            class="form-control question-box"
-                            rows="4"
-                            placeholder="Ejemplo: ¿Cuáles son las principales tecnologías de conectividad utilizadas actualmente en IoT y en qué escenarios conviene utilizar cada una?"
-                        ></textarea>
+            <div class="examples">
+                <span class="examples-label">Prueba con:</span>
 
-                        <div class="d-flex flex-column flex-md-row justify-content-between align-items-md-center gap-3 mt-4">
-                            <div class="helper-text">
-                                <i class="bi bi-info-circle me-1"></i>
-                                El agente mostrará en vivo las fuentes que vaya consultando.
-                            </div>
-
-                            <button
-                                id="btnInvestigar"
-                                class="btn btn-primary btn-lg action-btn"
-                            >
-                                <i class="bi bi-rocket-takeoff me-2"></i>
-                                Iniciar investigación
-                            </button>
-                        </div>
-
-                    </div>
-                </section>
-
-                <section
-                    id="actividad"
-                    class="glass-card mb-4 d-none"
+                <button
+                    type="button"
+                    class="example-chip"
+                    data-ejemplo="¿Qué ventajas tiene Kubernetes frente a Docker Swarm para orquestar contenedores?"
                 >
-                    <div class="p-4 p-lg-5">
+                    <i class="bi bi-hdd-network"></i>
+                    Kubernetes vs Docker Swarm
+                </button>
 
-                        <div class="d-flex flex-column flex-lg-row gap-4">
-
-                            <div class="flex-grow-1">
-                                <div class="section-heading mb-3">
-                                    <div class="section-icon pulse-icon">
-                                        <i class="bi bi-cpu"></i>
-                                    </div>
-
-                                    <div>
-                                        <span class="section-kicker">PROCESO</span>
-                                        <h2 class="section-title mb-1">
-                                            Actividad del agente
-                                        </h2>
-                                        <p class="section-subtitle mb-0">
-                                            Visualiza el avance de la investigación en tiempo real.
-                                        </p>
-                                    </div>
-                                </div>
-
-                                <div
-                                    id="estadoActual"
-                                    class="status-ribbon mb-4"
-                                >
-                                    Preparando la investigación...
-                                </div>
-
-                                <div class="process-track">
-                                    <div class="track-line"></div>
-
-                                    <div class="process-step" data-etapa="analizando">
-                                        <div class="process-bullet">
-                                            <i class="bi bi-lightbulb"></i>
-                                        </div>
-                                        <div class="process-label">Analizar</div>
-                                    </div>
-
-                                    <div class="process-step" data-etapa="busqueda">
-                                        <div class="process-bullet">
-                                            <i class="bi bi-globe2"></i>
-                                        </div>
-                                        <div class="process-label">Buscar</div>
-                                    </div>
-
-                                    <div class="process-step" data-etapa="revision">
-                                        <div class="process-bullet">
-                                            <i class="bi bi-journal-text"></i>
-                                        </div>
-                                        <div class="process-label">Revisar</div>
-                                    </div>
-
-                                    <div class="process-step" data-etapa="finalizando">
-                                        <div class="process-bullet">
-                                            <i class="bi bi-check2-square"></i>
-                                        </div>
-                                        <div class="process-label">Sintetizar</div>
-                                    </div>
-                                </div>
-
-                                <div
-                                    id="previewReporte"
-                                    class="preview-panel mt-4"
-                                >
-                                    <div class="preview-header">
-                                        <i class="bi bi-file-earmark-text me-2"></i>
-                                        Borrador del reporte
-                                    </div>
-
-                                    <div
-                                        id="previewContent"
-                                        class="preview-content"
-                                    >
-                                        El borrador aparecerá aquí mientras el agente redacta.
-                                    </div>
-                                </div>
-                            </div>
-
-                            <aside class="sources-sidebar">
-                                <div class="sidebar-header">
-                                    <div>
-                                        <span class="section-kicker">EVIDENCIA</span>
-                                        <h3 class="h5 mb-1">
-                                            Fuentes detectadas
-                                        </h3>
-                                        <p class="section-subtitle mb-0">
-                                            Sitios consultados durante la investigación.
-                                        </p>
-                                    </div>
-
-                                    <span
-                                        id="contadorFuentes"
-                                        class="counter-pill"
-                                    >
-                                        0
-                                    </span>
-                                </div>
-
-                                <div
-                                    id="fuentesEnVivo"
-                                    class="live-sources"
-                                >
-                                    <div
-                                        id="sinFuentes"
-                                        class="empty-sources"
-                                    >
-                                        Las fuentes aparecerán aquí conforme el agente
-                                        vaya consultándolas.
-                                    </div>
-                                </div>
-                            </aside>
-
-                        </div>
-
-                    </div>
-                </section>
-
-                <section
-                    id="error"
-                    class="alert alert-danger shadow-sm d-none"
-                ></section>
-
-                <section
-                    id="resultado"
-                    class="d-none"
+                <button
+                    type="button"
+                    class="example-chip"
+                    data-ejemplo="¿Cuáles son las principales amenazas de ciberseguridad para pequeñas empresas y cómo mitigarlas?"
                 >
-                    <div class="result-top">
-                        <div>
-                            <span class="section-kicker">RESULTADO</span>
-                            <h2 class="section-title mb-1">
-                                Reporte de investigación
-                            </h2>
-                            <p class="section-subtitle mb-0">
-                                Resultado final generado a partir de la búsqueda y análisis de fuentes.
-                            </p>
-                        </div>
+                    <i class="bi bi-shield-lock"></i>
+                    Ciberseguridad en PyMEs
+                </button>
 
-                        <div class="result-actions">
-                            <div class="result-badge">
-                                <i class="bi bi-check-circle-fill me-1"></i>
-                                Listo
-                            </div>
+                <button
+                    type="button"
+                    class="example-chip"
+                    data-ejemplo="¿Cuáles son los requisitos para hacer residencias profesionales en el Instituto Tecnológico de Pachuca?"
+                >
+                    <i class="bi bi-mortarboard"></i>
+                    Residencias en el Tec
+                </button>
+            </div>
 
-                            <button
-                                id="btnDescargarPdf"
-                                type="button"
-                                class="btn btn-primary pdf-btn"
-                            >
-                                <i class="bi bi-file-earmark-pdf me-1"></i>
-                                Descargar PDF
-                            </button>
-                        </div>
+            <div class="composer-footer">
+                <div class="helper-text">
+                    <i class="bi bi-info-circle"></i>
+                    Temas de TIC o del Tec de Pachuca.
+                    <span class="kbd-hint">
+                        Pulsa <kbd>Ctrl</kbd> + <kbd>Enter</kbd> para enviar.
+                    </span>
+                </div>
+
+                <button
+                    id="btnInvestigar"
+                    class="btn btn-primary action-btn"
+                >
+                    <i class="bi bi-search me-2"></i>
+                    Iniciar investigación
+                </button>
+            </div>
+        </section>
+
+        <section
+            id="actividad"
+            class="panel activity d-none"
+        >
+            <div class="panel-header">
+                <div class="section-heading">
+                    <div class="section-icon pulse-icon">
+                        <i class="bi bi-cpu"></i>
+                    </div>
+
+                    <div>
+                        <h2 class="section-title">
+                            Actividad del agente
+                        </h2>
+                        <p class="section-subtitle">
+                            Avance de la investigación en tiempo real.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div
+                id="estadoActual"
+                class="status-ribbon"
+            >
+                Preparando la investigación...
+            </div>
+
+            <div class="process-track">
+                <div class="track-line"></div>
+
+                <div class="process-step" data-etapa="analizando">
+                    <div class="process-bullet">
+                        <i class="bi bi-lightbulb"></i>
+                    </div>
+                    <div class="process-label">Analizar</div>
+                </div>
+
+                <div class="process-step" data-etapa="busqueda">
+                    <div class="process-bullet">
+                        <i class="bi bi-globe2"></i>
+                    </div>
+                    <div class="process-label">Buscar</div>
+                </div>
+
+                <div class="process-step" data-etapa="revision">
+                    <div class="process-bullet">
+                        <i class="bi bi-journal-text"></i>
+                    </div>
+                    <div class="process-label">Revisar</div>
+                </div>
+
+                <div class="process-step" data-etapa="finalizando">
+                    <div class="process-bullet">
+                        <i class="bi bi-check2-square"></i>
+                    </div>
+                    <div class="process-label">Sintetizar</div>
+                </div>
+            </div>
+
+            <div class="activity-grid">
+                <div
+                    id="previewReporte"
+                    class="preview-panel"
+                >
+                    <div class="preview-header">
+                        <i class="bi bi-file-earmark-text"></i>
+                        Borrador del reporte
                     </div>
 
                     <div
-                        id="reporte"
-                        class="report-layout"
-                    ></div>
+                        id="previewContent"
+                        class="preview-content"
+                    >
+                        El borrador aparecerá aquí mientras el agente redacta.
+                    </div>
+                </div>
 
-                    <section class="glass-card mt-4">
-                        <div class="p-4 p-lg-5">
-                            <div class="d-flex flex-wrap justify-content-between align-items-center gap-3 mb-4">
-                                <div>
-                                    <span class="section-kicker">REFERENCIAS</span>
-                                    <h3 class="section-title h4 mb-1">
-                                        Fuentes consultadas
-                                    </h3>
-                                    <p class="section-subtitle mb-0">
-                                        URLs detectadas por la actividad de búsqueda y por las citas del reporte.
-                                    </p>
-                                </div>
-
-                                <span
-                                    id="contadorFuentesFinal"
-                                    class="counter-pill solid"
-                                >
-                                    0
-                                </span>
-                            </div>
-
-                            <div
-                                id="fuentesFinales"
-                                class="row g-3"
-                            ></div>
+                <aside class="sources-sidebar">
+                    <div class="sidebar-header">
+                        <div>
+                            <h3 class="sidebar-title">
+                                Fuentes detectadas
+                            </h3>
+                            <p class="section-subtitle">
+                                Sitios consultados.
+                            </p>
                         </div>
-                    </section>
-                </section>
 
+                        <span
+                            id="contadorFuentes"
+                            class="counter-pill"
+                        >
+                            0
+                        </span>
+                    </div>
+
+                    <div
+                        id="fuentesEnVivo"
+                        class="live-sources"
+                    >
+                        <div
+                            id="sinFuentes"
+                            class="empty-sources"
+                        >
+                            Las fuentes aparecerán aquí conforme el agente
+                            vaya consultándolas.
+                        </div>
+                    </div>
+                </aside>
             </div>
-        </div>
+        </section>
+
+        <section
+            id="error"
+            class="alert alert-danger app-alert d-none"
+        ></section>
+
+        <section
+            id="resultado"
+            class="d-none"
+        >
+            <div class="result-top">
+                <div>
+                    <span class="eyebrow">Resultado</span>
+                    <h2 class="result-title">
+                        Reporte de investigación
+                    </h2>
+                    <p class="section-subtitle">
+                        Generado a partir de la búsqueda y el análisis de fuentes.
+                    </p>
+                </div>
+
+                <div class="result-actions">
+                    <div class="result-badge">
+                        <i class="bi bi-check-circle-fill"></i>
+                        Listo
+                    </div>
+
+                    <button
+                        id="btnDescargarPdf"
+                        type="button"
+                        class="btn btn-primary pdf-btn"
+                    >
+                        <i class="bi bi-file-earmark-pdf me-1"></i>
+                        Descargar PDF
+                    </button>
+                </div>
+            </div>
+
+            <div
+                id="reporte"
+                class="report-layout"
+            ></div>
+
+            <section class="panel sources-panel">
+                <div class="panel-header">
+                    <div class="section-heading">
+                        <div class="section-icon">
+                            <i class="bi bi-link-45deg"></i>
+                        </div>
+
+                        <div>
+                            <h3 class="section-title">
+                                Fuentes consultadas
+                            </h3>
+                            <p class="section-subtitle">
+                                URLs detectadas durante la búsqueda y en las citas del reporte.
+                            </p>
+                        </div>
+                    </div>
+
+                    <span
+                        id="contadorFuentesFinal"
+                        class="counter-pill solid"
+                    >
+                        0
+                    </span>
+                </div>
+
+                <div
+                    id="fuentesFinales"
+                    class="row g-3"
+                ></div>
+            </section>
+        </section>
 
     </main>
 
-    <footer class="footer py-4 mt-5">
-        <div class="container text-center small text-muted">
-            Inteligencia Artificial Aplicada a las TIC · Práctica 2.2 · Agente de investigación con búsqueda web
+    <footer class="footer">
+        <div class="app-shell footer-inner">
+            <div>
+                <strong>Instituto Tecnológico de Pachuca</strong>
+                · Inteligencia Artificial aplicada a las TIC · Práctica 2.2
+            </div>
+
+            <div>
+                Manzano Luna Claudia Melissa
+            </div>
         </div>
     </footer>
 

@@ -109,3 +109,9 @@ requirements.txt       Dependencias de Python
 - Restricción temática a TIC y consultas del Instituto Tecnológico de Pachuca.
 - Validación de origen con `ALLOWED_ORIGIN`.
 - Descarga del reporte en PDF.
+
+**V7 · Rediseño de la interfaz**
+
+- Diseño limpio con la paleta institucional del TecNM y favicon propio.
+- Ejemplos de preguntas que se pueden pulsar y atajo `Ctrl + Enter` para enviar.
+- Pie de página con los datos de la práctica.
